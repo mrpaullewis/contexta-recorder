@@ -1,0 +1,17 @@
+{
+  "name": "contexta-recorder",
+  "version": "0.1.0",
+  "description": "Contexta Performance Recorder — Chrome extension for JMeter test script generation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "jest": "^29.7.0"
+  }
+}

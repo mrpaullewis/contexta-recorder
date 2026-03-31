@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root { --navy: #1F5240; --teal: #5D8B84; --gray-200: #e2e8f0; --gray-600: #475569; --radius: 6px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 500px; margin: 20px auto; color: #1e293b; }
+    h1 { font-size: 1.2rem; color: var(--navy); margin: 0 0 16px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: .8rem; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+    .field input, .field textarea { width: 100%; padding: 8px; border: 1px solid var(--gray-200); border-radius: var(--radius); font-size: .85rem; }
+    .field textarea { height: 60px; font-family: monospace; }
+    button { padding: 8px 16px; background: var(--navy); color: #fff; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; }
+    button:hover { background: #163d30; }
+    .status { margin-top: 8px; font-size: .8rem; color: var(--teal); }
+  </style>
+</head>
+<body>
+  <h1>Contexta Recorder Settings</h1>
+  <div class="field">
+    <label>Assure URL</label>
+    <input type="url" id="opt-assure-url" placeholder="https://dev.contexta.uk">
+  </div>
+  <div class="field">
+    <label>API Key</label>
+    <input type="password" id="opt-api-key" placeholder="Your Assure API key">
+  </div>
+  <div class="field">
+    <label>Default Journey Code</label>
+    <input type="text" id="opt-journey-code" value="UJ01">
+  </div>
+  <div class="field">
+    <label>Transaction Naming Convention</label>
+    <select id="opt-naming">
+      <option value="slug">With page slug — UJ01_S01_login-page</option>
+      <option value="nhs">NHS style — Covid_S01_proxy-booking-question</option>
+      <option value="plain">Plain — UJ01_S01</option>
+    </select>
+    <div style="font-size:.75rem;color:var(--gray-600);margin-top:3px;">
+      Preview: <span id="opt-naming-preview" style="font-family:monospace;"></span>
+    </div>
+  </div>
+  <div class="field">
+    <label>Step Number Padding</label>
+    <select id="opt-padding">
+      <option value="2">2 digits — S01</option>
+      <option value="3">3 digits — S001</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Excluded Domains (one per line)</label>
+    <textarea id="opt-excluded"></textarea>
+  </div>
+  <button id="opt-save">Save</button>
+  <button id="opt-test" style="background:var(--teal);margin-left:8px;">Test Connection</button>
+  <div class="status" id="opt-status"></div>
+
+  <script src="options.js" type="module"></script>
+</body>
+</html>

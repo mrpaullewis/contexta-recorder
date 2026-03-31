@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Contexta Performance Recorder",
+  "version": "0.1.0",
+  "description": "Record browser sessions and generate JMeter JMX performance test scripts with automatic correlation detection, field classification, and assertion generation.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "webRequest",
+    "activeTab",
+    "storage",
+    "tabs",
+    "downloads",
+    "debugger",
+    "identity"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/content-script.js", "content/page-analyser.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "devtools_page": "panel/devtools.html",
+  "options_page": "options/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

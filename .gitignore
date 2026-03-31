@@ -1,0 +1,5 @@
+node_modules/
+.claude/
+test-results/
+package-lock.json
+contexta-recorder.zip

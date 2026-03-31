@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="cr-header">
+    <img src="../icons/icon48.png" alt="" class="cr-logo">
+    <div>
+      <div class="cr-title">Contexta Recorder</div>
+      <div class="cr-subtitle" id="cr-status">Ready</div>
+    </div>
+    <div class="cr-header-auth" id="cr-header-auth"></div>
+  </div>
+
+  <!-- Auth: Login form (shown when not logged in, toggled by Sign in link) -->
+  <div id="cr-auth-login" style="display:none;">
+    <div class="cr-auth-box">
+      <div class="cr-auth-title">Sign in to Contexta</div>
+      <div class="cr-auth-error" id="cr-auth-error" style="display:none;"></div>
+      <div class="cr-auth-providers">
+        <button class="cr-btn-oauth cr-btn-google" id="cr-auth-google">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <button class="cr-btn-oauth cr-btn-microsoft" id="cr-auth-sso">
+          <svg viewBox="0 0 21 21" width="18" height="18"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+          Continue with Microsoft
+        </button>
+      </div>
+      <div class="cr-auth-divider"><span>or</span></div>
+      <div class="cr-field">
+        <label>Email</label>
+        <input type="email" id="cr-auth-email" placeholder="you@company.com">
+      </div>
+      <div class="cr-field">
+        <label>Password</label>
+        <input type="password" id="cr-auth-password" placeholder="Password">
+      </div>
+      <div class="cr-auth-actions">
+        <button class="cr-btn cr-btn-primary" id="cr-auth-signin">Sign in</button>
+        <button class="cr-btn" id="cr-auth-register">Create free account</button>
+      </div>
+      <div class="cr-auth-cancel"><a href="#" id="cr-auth-cancel">Cancel</a></div>
+    </div>
+  </div>
+
+  <!-- Auth: Logged-in badge (shown in results when logged in) -->
+  <div id="cr-auth-badge" style="display:none;">
+    <div class="cr-auth-user">
+      <div class="cr-auth-user-info">
+        <span class="cr-auth-name" id="cr-auth-name"></span>
+        <span class="cr-auth-org" id="cr-auth-org"></span>
+      </div>
+      <a href="#" class="cr-auth-signout" id="cr-auth-signout">Sign out</a>
+    </div>
+  </div>
+
+  <!-- Setup (shown when idle) -->
+  <div id="cr-setup">
+    <div class="cr-field">
+      <label title="A short code used as the prefix for transaction names (e.g. UJ01_S01_login)">Journey Code</label>
+      <input type="text" id="cr-journey-code" value="UJ01" placeholder="UJ01" title="e.g. UJ01, Covid, Flu, Login — used in transaction names and file names">
+    </div>
+    <div class="cr-field">
+      <label title="How transactions are created during recording">Recording Mode</label>
+      <select id="cr-mode" title="Auto = new transaction on page navigation. Transaction = you click New Transaction. Full = one block, split later.">
+        <option value="auto">Auto (split on page navigation)</option>
+        <option value="transaction">Transaction (mark UJ boundaries live)</option>
+        <option value="full">Full (split later)</option>
+      </select>
+    </div>
+    <button class="cr-btn cr-btn-record" id="cr-start" title="Attach the debugger to the active tab and begin capturing requests">Start Recording</button>
+  </div>
+
+  <!-- Active recording (shown when recording/paused) -->
+  <div id="cr-active" style="display:none;">
+    <div class="cr-controls">
+      <button class="cr-btn cr-btn-pause" id="cr-pause" title="Pause or resume request capture — the debugger stays attached">Pause</button>
+      <button class="cr-btn cr-btn-stop" id="cr-stop" title="Stop recording, detach debugger, and run correlation analysis">Stop</button>
+      <button class="cr-btn cr-btn-tx" id="cr-new-tx" title="Start a new transaction boundary — use in Transaction mode to mark step boundaries">New Transaction</button>
+    </div>
+    <div class="cr-stats">
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-stat-tx">0</span><span class="cr-stat-label">Transactions</span></div>
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-stat-req">0</span><span class="cr-stat-label">Requests</span></div>
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-stat-time">0s</span><span class="cr-stat-label">Duration</span></div>
+    </div>
+    <div class="cr-current-tx" id="cr-current-tx"></div>
+    <div class="cr-tx-list" id="cr-tx-list"></div>
+    <div class="cr-live-log" id="cr-live-log"></div>
+  </div>
+
+  <!-- Results (shown after stop) -->
+  <div id="cr-results" style="display:none;">
+    <div class="cr-stats">
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-res-tx">0</span><span class="cr-stat-label">Transactions</span></div>
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-res-req">0</span><span class="cr-stat-label">Requests</span></div>
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-res-corr">0</span><span class="cr-stat-label">Correlations</span></div>
+      <div class="cr-stat"><span class="cr-stat-val" id="cr-res-fields">0</span><span class="cr-stat-label">Fields</span></div>
+    </div>
+    <div class="cr-tx-list" id="cr-res-list"></div>
+    <div class="cr-analysis" id="cr-analysis"></div>
+
+    <!-- Data Summary -->
+    <div class="cr-data-summary" id="cr-data-summary"></div>
+
+    <div class="cr-field" style="padding:0 14px 4px;">
+      <label title="Choose how the JMX is structured — Fragment for use inside a test orchestrator, Standalone to run directly in JMeter">JMX Output Mode</label>
+      <select id="cr-jmx-mode" title="Fragment = TestFragmentController for IncludeController. Standalone = full TestPlan with thread group.">
+        <option value="fragment">Fragment (for PerftestFramework IncludeController)</option>
+        <option value="standalone">Standalone (full TestPlan, run directly)</option>
+      </select>
+    </div>
+    <div class="cr-actions">
+      <button class="cr-btn cr-btn-primary" id="cr-download-jmx" title="Download JMeter JMX script — ready to run or include in PerftestFramework">Download JMX</button>
+      <button class="cr-btn cr-btn-export" id="cr-download-har" title="Download HTTP Archive (HAR 1.2) — compatible with browser DevTools, Charles, Fiddler">Download HAR</button>
+      <button class="cr-btn cr-btn-export" id="cr-download-json" title="Download the full recording session as JSON — includes correlations, fingerprints, page analysis">Download JSON</button>
+      <button class="cr-btn cr-btn-csv" id="cr-download-csv" title="Download a CSV test data template with columns derived from form fields found during recording">Download CSV</button>
+    </div>
+    <!-- Cloud actions -->
+    <div class="cr-cloud-actions" id="cr-cloud-actions" style="display:none;">
+      <div class="cr-cloud-divider">Contexta Assure</div>
+      <div class="cr-actions">
+        <button class="cr-btn cr-btn-assure" id="cr-push-assure" title="Save recording and push script manifest to Assure Run Builder">Push to Assure</button>
+        <button class="cr-btn cr-btn-nhs" id="cr-push-nhs" title="Save recording and push to NHS PerfTest Dashboard">Push to NHS Dashboard</button>
+      </div>
+    </div>
+    <div class="cr-auth-prompt" id="cr-auth-prompt" style="display:none;">
+      <span>Sign in to save recordings to the cloud</span>
+      <a href="#" id="cr-auth-prompt-link">Sign in</a>
+    </div>
+    <div class="cr-actions" style="padding-bottom:0;">
+      <button class="cr-btn cr-btn-new" id="cr-new-recording" style="margin:0;" title="Start a new recording — keeps the current session in storage">New Recording</button>
+      <button class="cr-btn cr-btn-clear" id="cr-clear-session" style="margin:0;" title="Clear the current session from storage and reset">Clear</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="cr-footer">
+    <a href="../welcome/welcome.html" target="_blank">Help &amp; Guide</a>
+    <span>&middot;</span>
+    <a href="https://dev.contexta.uk" target="_blank">Contexta Assure</a>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contexta Performance Recorder — Welcome</title>
+  <style>
+    :root {
+      --navy: #1F5240;
+      --teal: #5D8B84;
+      --gold: #D5A344;
+      --bg: #0a0f0d;
+      --bg-card: #151d19;
+      --border: #1f2b25;
+      --text: #e8ebe9;
+      --text-muted: #8a9690;
+      --radius: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 60px 24px 40px;
+      background: linear-gradient(180deg, #111916 0%, var(--bg) 100%);
+    }
+    .hero-logo { width: 72px; height: 72px; margin-bottom: 16px; border-radius: 12px; }
+    .hero h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .hero h1 span { color: var(--gold); }
+    .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+    /* Content */
+    .content { max-width: 800px; margin: 0 auto; padding: 0 24px 60px; }
+
+    /* Quick start */
+    .quick-start {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+    .quick-start h2 { font-size: 1.1rem; margin-bottom: 16px; color: var(--gold); }
+    .steps { counter-reset: step; }
+    .step {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step::before {
+      content: counter(step);
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .step-text { flex: 1; }
+    .step-text strong { color: var(--text); }
+    .step-text p { font-size: 0.9rem; color: var(--text-muted); margin-top: 2px; }
+    kbd {
+      background: #1f2b25;
+      border: 1px solid #2a3830;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: var(--mono);
+      font-size: 0.85em;
+    }
+
+    /* Features grid */
+    .features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+    .feature {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .feature-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .feature h3 { font-size: 0.95rem; margin-bottom: 6px; }
+    .feature p { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* What it detects */
+    .detects {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+    .detects h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--gold); }
+    .detect-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .detect-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; color: var(--text-muted);
+      padding: 6px 10px;
+      background: rgba(31,82,64,0.15);
+      border-radius: 4px;
+    }
+    .detect-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 40px 24px;
+      background: linear-gradient(180deg, var(--bg) 0%, #111916 100%);
+      border-radius: var(--radius);
+      margin-bottom: 32px;
+    }
+    .cta h2 { font-size: 1.3rem; margin-bottom: 8px; }
+    .cta p { color: var(--text-muted); margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: var(--font);
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--gold); color: #1a1a1a; }
+    .btn-primary:hover { background: #e0b55a; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg-card); border-color: var(--teal); }
+    .btn-assure { background: var(--navy); color: #fff; }
+    .btn-assure:hover { background: #163d30; }
+
+    /* Assure pitch */
+    .assure-pitch {
+      background: linear-gradient(135deg, var(--navy), #1a3d32);
+      border: 1px solid var(--teal);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+    .assure-pitch h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    .assure-pitch p { color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+    .assure-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .assure-feature {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.9);
+    }
+    .assure-check { color: var(--gold); font-weight: 700; }
+
+    /* Help section */
+    .help {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+    .help h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--gold); }
+    .help-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .help-item:last-child { border-bottom: none; }
+    .help-item summary {
+      cursor: pointer; font-weight: 600; font-size: 0.9rem;
+      padding: 4px 0; color: var(--text);
+    }
+    .help-item summary:hover { color: var(--gold); }
+    .help-item p, .help-item ul { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+    .help-item ul { padding-left: 20px; }
+    .help-item li { margin-bottom: 4px; }
+
+    /* Footer */
+    .footer { text-align: center; padding: 24px; font-size: 0.8rem; color: var(--text-muted); }
+    .footer a { color: var(--teal); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .features { grid-template-columns: 1fr; }
+      .detect-grid { grid-template-columns: 1fr 1fr; }
+      .assure-features { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <img src="../icons/icon128.png" alt="Contexta Recorder" class="hero-logo">
+    <h1>Contexta <span>Performance Recorder</span></h1>
+    <p>Record browser sessions and generate production-ready JMeter performance test scripts — with automatic correlation detection, field classification, and assertion generation.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- Quick Start -->
+    <div class="quick-start">
+      <h2>Quick Start</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-text">
+            <strong>Click the Contexta icon in your browser toolbar</strong>
+            <p>The recorder popup opens. Set your journey code (e.g. "Login", "Booking") and recording mode.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-text">
+            <strong>Click "Start Recording" and use the website normally</strong>
+            <p>Navigate through the journey you want to performance test. Fill in forms, click buttons, follow the flow.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-text">
+            <strong>Click "Stop" when you've completed the journey</strong>
+            <p>The recorder analyses your session — detecting correlations, classifying form fields, and generating assertions.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-text">
+            <strong>Download your JMX script</strong>
+            <p>Choose Fragment mode (for PerftestFramework) or Standalone (run directly in JMeter). Also export HAR, JSON, or CSV test data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">&#x1f50d;</div>
+        <h3>Automatic Correlation</h3>
+        <p>Detects CSRF tokens, session cookies, dynamic IDs, redirect targets, and JSON values that need extracting.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#x1f3f7;&#xfe0f;</div>
+        <h3>Field Classification</h3>
+        <p>Every form field is classified: CSRF, hidden, text input, radio, select, checkbox. Drives parameterisation automatically.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#x2705;</div>
+        <h3>Assertion Generation</h3>
+        <p>Creates response assertions for page titles, headings, status codes, and negative checks (e.g. "session expired").</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#x1f4ca;</div>
+        <h3>Test Data Mapping</h3>
+        <p>Identifies fields that need test data, suggests CSV column names, and generates the CSVDataSet config in JMX.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#x1f9ec;</div>
+        <h3>Question Fingerprints</h3>
+        <p>Pages are identified by their content, not their URL. Configs work across environments and survive URL changes.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#x1f4e6;</div>
+        <h3>Multiple Export Formats</h3>
+        <p>JMX (Fragment or Standalone), HAR, raw JSON recording, and CSV test data template — all from one recording.</p>
+      </div>
+    </div>
+
+    <!-- What it detects -->
+    <div class="detects">
+      <h2>What It Detects</h2>
+      <div class="detect-grid">
+        <div class="detect-item"><span class="detect-dot"></span>CSRF tokens</div>
+        <div class="detect-item"><span class="detect-dot"></span>Session cookies</div>
+        <div class="detect-item"><span class="detect-dot"></span>Dynamic IDs</div>
+        <div class="detect-item"><span class="detect-dot"></span>Redirect chains</div>
+        <div class="detect-item"><span class="detect-dot"></span>Hidden form fields</div>
+        <div class="detect-item"><span class="detect-dot"></span>ViewState (ASP.NET)</div>
+        <div class="detect-item"><span class="detect-dot"></span>JSON API values</div>
+        <div class="detect-item"><span class="detect-dot"></span>Form submissions</div>
+        <div class="detect-item"><span class="detect-dot"></span>Page structure</div>
+      </div>
+    </div>
+
+    <!-- Recording Modes -->
+    <div class="help">
+      <h2>Recording Modes</h2>
+      <details class="help-item" open>
+        <summary>Auto (recommended)</summary>
+        <p>Automatically creates a new transaction on each page navigation. Best for standard web flows — login, forms, multi-step wizards.</p>
+      </details>
+      <details class="help-item">
+        <summary>Transaction</summary>
+        <p>You manually mark transaction boundaries by clicking "New Transaction" in the popup. Use this when you want precise control over step grouping.</p>
+      </details>
+      <details class="help-item">
+        <summary>Full</summary>
+        <p>Records everything as a single block. Split into transactions later. Useful for exploratory recording where you're not sure about the boundaries yet.</p>
+      </details>
+    </div>
+
+    <!-- Export Guide -->
+    <div class="help">
+      <h2>Export Formats</h2>
+      <details class="help-item" open>
+        <summary>JMX — Fragment Mode</summary>
+        <p>Generates a TestFragmentController, designed for use with an IncludeController in a test orchestrator like PerftestFramework. Contains transaction controllers, HTTP samplers, extractors, assertions, and think time — but no thread group or test plan wrapper.</p>
+      </details>
+      <details class="help-item">
+        <summary>JMX — Standalone Mode</summary>
+        <p>Generates a complete TestPlan with thread group, HTTP request defaults, cookie/cache managers, and a header manager. Ready to open and run directly in JMeter.</p>
+      </details>
+      <details class="help-item">
+        <summary>HAR</summary>
+        <p>Standard HTTP Archive format (HAR 1.2). Compatible with browser DevTools, Charles Proxy, Fiddler, and other tools. Good for sharing recordings with developers.</p>
+      </details>
+      <details class="help-item">
+        <summary>JSON</summary>
+        <p>The complete recording session including all analysis data: correlations, field classifications, assertions, fingerprints, and page responses. Use this for debugging or feeding into other tools.</p>
+      </details>
+      <details class="help-item">
+        <summary>CSV</summary>
+        <p>A test data template with column headers derived from the form fields found during recording, plus one row of sample data. Use as a starting point for your test data files.</p>
+      </details>
+    </div>
+
+    <!-- FAQ -->
+    <div class="help">
+      <h2>FAQ</h2>
+      <details class="help-item">
+        <summary>What gets filtered out?</summary>
+        <p>Static resources (CSS, JS, images, fonts), third-party analytics (Google Analytics, Hotjar, etc.), and browser-internal requests are automatically excluded. You can customise excluded domains in the extension options.</p>
+      </details>
+      <details class="help-item">
+        <summary>Does it work with Single Page Applications?</summary>
+        <p>Yes. The recorder captures XHR and Fetch requests alongside page navigations. For SPAs, use "Transaction" mode so you can mark step boundaries manually.</p>
+      </details>
+      <details class="help-item">
+        <summary>Can I record behind a login?</summary>
+        <p>Yes. Start recording before you log in, and the recorder captures the entire authentication flow including session cookies and CSRF tokens. These are automatically correlated in the JMX output.</p>
+      </details>
+      <details class="help-item">
+        <summary>How do correlations work?</summary>
+        <p>The recorder scans page HTML for dynamic values (hidden inputs, meta tags, embedded JSON) and tracks where those values appear in subsequent POST requests. It then generates JMeter RegexExtractors or JSONPostProcessors to extract them at runtime.</p>
+      </details>
+      <details class="help-item">
+        <summary>What about think time?</summary>
+        <p>A UniformRandomTimer is added to the JMX with configurable min/max delays (default 500ms-3000ms). In PerftestFramework mode, these use JMeter properties so you can override them from the pipeline.</p>
+      </details>
+      <details class="help-item">
+        <summary>Do I need a Contexta account?</summary>
+        <p>No. The recorder works completely standalone — record, analyse, and download scripts with no account needed. Sign in to save recordings to the cloud, share with your team, or push directly to Contexta Assure for test execution.</p>
+      </details>
+    </div>
+
+    <!-- Assure Pitch -->
+    <div class="assure-pitch">
+      <h2>Take it further with Contexta Assure</h2>
+      <p>The recorder gives you the script. Assure gives you the pipeline — from test data generation to distributed execution to NFR evaluation.</p>
+      <div class="assure-features">
+        <div class="assure-feature"><span class="assure-check">+</span> Save recordings to the cloud</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Push scripts to the Run Builder</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Generate test data from DataFileSpecs</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Execute distributed load tests</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Auto-evaluate NFR pass/fail</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Share journey configs with your team</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Fingerprint-based config reuse</div>
+        <div class="assure-feature"><span class="assure-check">+</span> Results dashboards and trend analysis</div>
+      </div>
+      <div class="cta-buttons">
+        <a href="https://dev.contexta.uk" target="_blank" class="btn btn-primary">Try Assure Free</a>
+        <a href="https://dev.contexta.uk/help/" target="_blank" class="btn btn-secondary">Learn More</a>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="cta">
+      <h2>Ready to record?</h2>
+      <p>Click the Contexta icon in your toolbar to start your first recording. No setup needed.</p>
+      <div class="cta-buttons">
+        <button class="btn btn-primary" onclick="window.close()">Got it, let's go</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>Contexta Performance Recorder v0.1.0 &middot; <a href="https://dev.contexta.uk">dev.contexta.uk</a> &middot; <a href="https://dev.contexta.uk/help/">Help</a></p>
+  </div>
+
+</body>
+</html>
