@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Contexta Performance Recorder",
   "version": "0.1.0",
-  "description": "Record browser sessions and generate JMeter JMX performance test scripts with automatic correlation detection, field classification, and assertion generation.",
+  "description": "Record browser sessions and generate JMeter JMX scripts with automatic correlation detection and assertions.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

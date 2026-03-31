@@ -19,11 +19,13 @@ async function getAssureUrl() {
 }
 
 async function nhsFetch(path, options = {}) {
+  const opts = await getOptions();
+  const baseUrl = (opts.nhsUrl || NHS_API.DEFAULT_URL).replace(/\/$/, '');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (currentAuth?.token) {
     headers['Authorization'] = `Bearer ${currentAuth.token}`;
   }
-  return fetch(NHS_API.DEFAULT_URL + path, { ...options, headers });
+  return fetch(baseUrl + path, { ...options, headers });
 }
 
 async function assureFetch(path, options = {}) {
