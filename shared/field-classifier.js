@@ -10,7 +10,7 @@
  * - checkbox: toggles (fixed value)
  * - static: unchanging values (hardcoded in JMX)
  *
- * Also suggests Assure DataFileSpec column types for parameterisation.
+ * Also suggests data column types for parameterisation.
  */
 import { CSRF_FIELD_NAMES, FIELD_TYPE_HINTS } from './constants.js';
 
@@ -30,7 +30,7 @@ export function classifyFields(session) {
 
         // Only fields that need parameterisation go into dataRequirements
         if (classification === 'input' || classification === 'radio' || classification === 'select') {
-          const assureType = suggestAssureColumnType(field);
+          const assureType = suggestColumnType(field);
           dataRequirements.push({
             fieldName: field.name,
             fieldType: field.type,
@@ -40,7 +40,7 @@ export function classifyFields(session) {
             sampleValue: field.value || '',
             label: field.label || '',
             suggestedCsvColumn: suggestCsvColumn(field),
-            assureColumnType: assureType,
+            columnType: assureType,
             datafileSpecId: null,
             datafileColumn: null,
           });
@@ -91,9 +91,9 @@ export function classifyField(field, correlations) {
 }
 
 /**
- * Suggest an Assure DataFileSpec column type based on field characteristics.
+ * Suggest a data column type based on field characteristics.
  */
-export function suggestAssureColumnType(field) {
+export function suggestColumnType(field) {
   const name = (field.name || '').toLowerCase();
   const type = (field.type || '').toLowerCase();
   const label = (field.label || '').toLowerCase();

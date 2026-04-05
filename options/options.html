@@ -18,16 +18,16 @@
 <body>
   <h1>Contexta Recorder Settings</h1>
   <div class="field">
-    <label>Assure URL</label>
-    <input type="url" id="opt-assure-url" placeholder="https://dev.contexta.uk">
+    <label>PerfOps Studio URL</label>
+    <input type="url" id="opt-studio-url" placeholder="http://localhost:5000">
   </div>
   <div class="field">
     <label>NHS Dashboard URL</label>
-    <input type="url" id="opt-nhs-url" placeholder="http://nbs-generic-mock-vm-feat.uksouth.cloudapp.azure.com:8081">
+    <input type="url" id="opt-nhs-url" placeholder="http://nbs-generic-mock-vm:8081">
   </div>
   <div class="field">
     <label>API Key</label>
-    <input type="password" id="opt-api-key" placeholder="Your Assure API key">
+    <input type="password" id="opt-api-key" placeholder="Your API key">
   </div>
   <div class="field">
     <label>Default Journey Code</label>
@@ -37,7 +37,6 @@
     <label>Transaction Naming Convention</label>
     <select id="opt-naming">
       <option value="slug">With page slug — UJ01_S01_login-page</option>
-      <option value="nhs">NHS style — Covid_S01_proxy-booking-question</option>
       <option value="plain">Plain — UJ01_S01</option>
     </select>
     <div style="font-size:.75rem;color:var(--gray-600);margin-top:3px;">
@@ -56,7 +55,7 @@
     <textarea id="opt-excluded"></textarea>
   </div>
   <button id="opt-save">Save</button>
-  <button id="opt-test" style="background:var(--teal);margin-left:8px;">Test Connection</button>
+  <button id="opt-test-studio" style="background:var(--teal);margin-left:8px;">Test Studio</button>
   <div class="status" id="opt-status"></div>
 
   <script src="options.js" type="module"></script>

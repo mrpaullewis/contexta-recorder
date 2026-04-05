@@ -120,9 +120,9 @@
     </div>
     <!-- Cloud actions -->
     <div class="cr-cloud-actions" id="cr-cloud-actions" style="display:none;">
-      <div class="cr-cloud-divider">Contexta Assure</div>
+      <div class="cr-cloud-divider">PerfOps Studio</div>
       <div class="cr-actions">
-        <button class="cr-btn cr-btn-assure" id="cr-push-assure" title="Save recording and push script manifest to Assure Run Builder">Push to Assure</button>
+        <button class="cr-btn cr-btn-studio" id="cr-push-studio" title="Save recording to PerfOps Studio">Push to Studio</button>
         <button class="cr-btn cr-btn-nhs" id="cr-push-nhs" title="Save recording and push to NHS PerfTest Dashboard">Push to NHS Dashboard</button>
       </div>
     </div>
@@ -130,6 +130,18 @@
       <span>Sign in to save recordings to the cloud</span>
       <a href="#" id="cr-auth-prompt-link">Sign in</a>
     </div>
+    <!-- PerfOps Studio nudge -->
+    <div class="cr-studio-nudge" id="cr-studio-nudge">
+      <div class="cr-studio-nudge-icon">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <div class="cr-studio-nudge-text">
+        <div class="cr-studio-nudge-title">Build a full load test?</div>
+        <div class="cr-studio-nudge-desc" id="cr-studio-nudge-desc">Combine recordings into a visual test plan with live monitoring and NFR compliance.</div>
+      </div>
+      <a href="https://perfops.studio" target="_blank" class="cr-studio-nudge-link" title="Open PerfOps Studio — visual test plan builder with live monitoring">PerfOps Studio &rarr;</a>
+    </div>
+
     <div class="cr-actions" style="padding-bottom:0;">
       <button class="cr-btn cr-btn-new" id="cr-new-recording" style="margin:0;" title="Start a new recording — keeps the current session in storage">New Recording</button>
       <button class="cr-btn cr-btn-clear" id="cr-clear-session" style="margin:0;" title="Clear the current session from storage and reset">Clear</button>
@@ -140,7 +152,9 @@
   <div class="cr-footer">
     <a href="../welcome/welcome.html" target="_blank">Help &amp; Guide</a>
     <span>&middot;</span>
-    <a href="https://dev.contexta.uk" target="_blank">Contexta Assure</a>
+    <a href="https://perfops.studio" target="_blank">PerfOps Studio</a>
+    <span>&middot;</span>
+    <a href="../options/options.html" target="_blank">Settings</a>
   </div>
 
   <script src="popup.js" type="module"></script>

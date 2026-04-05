@@ -148,10 +148,18 @@ export function processRequest(session, params) {
   // If this is a redirect, save the original request (e.g. POST) before it's overwritten
   if (redirectResponse && session.pendingRequests[requestId]) {
     const original = session.pendingRequests[requestId];
+    // Capture the redirect Location — needed for branching in the builder
+    const redirectHeaders = redirectResponse.headers || {};
+    let redirectLocation = '';
+    for (const [key, val] of Object.entries(redirectHeaders)) {
+      if (key.toLowerCase() === 'location') { redirectLocation = val; break; }
+    }
+
     original.response = {
       status: redirectResponse.status,
       statusText: redirectResponse.statusText || '',
-      headers: redirectResponse.headers || {},
+      headers: redirectHeaders,
+      redirectLocation,
       contentType: redirectResponse.mimeType || '',
       bodySnippet: '', // redirects have no body
       timing: redirectResponse.timing ? {

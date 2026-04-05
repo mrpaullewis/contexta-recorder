@@ -93,15 +93,12 @@ export const THINK_TIME = {
 // with hidden fields and CSRF tokens typically starts after 4-6KB.
 export const MAX_BODY_SNIPPET = 65536;
 
-// Assure API defaults
-export const ASSURE_API = {
-  DEFAULT_URL: 'https://dev.contexta.uk',
-  MANIFEST_ENDPOINT: '/api/v1/manifests',
-  CONFIGS_ENDPOINT: '/nfr-perftest/run-builder/configs',
-  SPECS_ENDPOINT: '/nfr-perftest/data-generator/specs',
-};
-
-// NHS PerfTest Dashboard
-export const NHS_API = {
-  DEFAULT_URL: 'http://nbs-generic-mock-vm-feat.uksouth.cloudapp.azure.com:8081',
+// PerfOps Studio API defaults
+export const STUDIO_API = {
+  DEFAULT_URL: 'http://localhost:5000',
+  HEALTH_ENDPOINT: '/health',
+  AUTH_LOGIN: '/api/v1/auth/login',
+  RECORDINGS_ENDPOINT: '/api/v1/recordings',
+  MANIFESTS_ENDPOINT: '/builder/manifests',
+  CONFIGS_ENDPOINT: '/builder/configs',
 };

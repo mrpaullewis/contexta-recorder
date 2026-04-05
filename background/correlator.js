@@ -58,6 +58,11 @@ function detectFromPageResponses(session) {
   const allRequests = flattenRequests(session);
   const pageResponses = session.pageResponses || [];
 
+  // Pre-parse ALL POST bodies once — build lookup indexes
+  // byNameValue: "fieldName=value" → [{transaction, seq, field}]
+  // byValue: "longValue" → [{transaction, seq, field}]
+  const postIndex = buildPostIndex(allRequests);
+
   for (let p = 0; p < pageResponses.length; p++) {
     const page = pageResponses[p];
     const pageBody = page.body;
@@ -69,8 +74,8 @@ function detectFromPageResponses(session) {
     for (const extracted of extractedValues) {
       if (isStaticValue(extracted.value)) continue;
 
-      // Search forward through POST requests that come AFTER this page
-      const consumers = findConsumers(allRequests, page.seq, extracted.name, extracted.value);
+      // Fast lookup instead of scanning all requests
+      const consumers = findConsumersIndexed(postIndex, page.seq, extracted.name, extracted.value);
       if (consumers.length === 0) continue;
 
       const fieldNameLower = extracted.name.toLowerCase();
@@ -101,6 +106,71 @@ function detectFromPageResponses(session) {
   }
 
   return correlations;
+}
+
+/**
+ * Pre-parse all POST bodies into lookup indexes.
+ * Called once, then used for O(1) lookups instead of O(n) scans.
+ */
+function buildPostIndex(allRequests) {
+  const byNameValue = new Map();  // "name=decodedValue" → [{transaction, seq, field}]
+  const byValue = new Map();      // "decodedValue" → [{transaction, seq, field}] (for long values)
+
+  for (const { entry, txName } of allRequests) {
+    if (entry.method !== 'POST' || !entry.body) continue;
+
+    const fields = parsePostBody(entry.body);
+    for (const field of fields) {
+      let decodedValue;
+      try {
+        decodedValue = decodeURIComponent(field.value.replace(/\+/g, ' '));
+      } catch {
+        decodedValue = field.value;
+      }
+
+      const nameValueKey = `${field.name}=${decodedValue}`;
+      if (!byNameValue.has(nameValueKey)) byNameValue.set(nameValueKey, []);
+      byNameValue.get(nameValueKey).push({ transaction: txName, seq: entry.seq, field: field.name });
+
+      if (decodedValue.length >= 20) {
+        if (!byValue.has(decodedValue)) byValue.set(decodedValue, []);
+        byValue.get(decodedValue).push({ transaction: txName, seq: entry.seq, field: field.name });
+      }
+    }
+  }
+
+  return { byNameValue, byValue };
+}
+
+/**
+ * Fast consumer lookup using pre-built index.
+ */
+function findConsumersIndexed(postIndex, pageSeq, fieldName, value) {
+  const consumers = [];
+  const seen = new Set();
+
+  // Match by field name AND value
+  const nameValueKey = `${fieldName}=${value}`;
+  const nameMatches = postIndex.byNameValue.get(nameValueKey) || [];
+  for (const match of nameMatches) {
+    if (match.seq > pageSeq && !seen.has(match.seq)) {
+      consumers.push({ transaction: match.transaction, seq: match.seq, field: match.field });
+      seen.add(match.seq);
+    }
+  }
+
+  // For long unique values, also match by value alone
+  if (value.length >= 20) {
+    const valueMatches = postIndex.byValue.get(value) || [];
+    for (const match of valueMatches) {
+      if (match.seq > pageSeq && !seen.has(match.seq)) {
+        consumers.push({ transaction: match.transaction, seq: match.seq, field: match.field });
+        seen.add(match.seq);
+      }
+    }
+  }
+
+  return consumers;
 }
 
 /**
@@ -352,9 +422,32 @@ function detectDynamicRedirects(session) {
       if (key.toLowerCase() === 'location') { location = val; break; }
     }
     if (!location) continue;
-    if (!isDynamicUrl(location)) continue;
 
-    if (i + 1 < allRequests.length) {
+    // Store redirect location on EVERY 302 — the builder needs this for branching
+    // Extract the path portion for use as redirectionLocation
+    let locationPath = location;
+    try {
+      const parsed = new URL(location, 'https://placeholder');
+      locationPath = parsed.pathname;
+    } catch { /* use as-is */ }
+
+    // Store as a redirect correlation — always, not just dynamic URLs
+    correlations.push({
+      name: 'redirectionLocation',
+      type: 'redirect',
+      extractType: 'url',
+      extractRegex: '/book-a-coronavirus-vaccination/(.*)',
+      extractJsonPath: null,
+      sourceTransaction: txName,
+      sourceRequestSeq: entry.seq,
+      sourceUrl: entry.url,
+      sourceLocation: 'redirect_url',
+      sampleValue: locationPath.substring(0, 200),
+      usedInRequests: [],
+    });
+
+    // Also create specific correlations for dynamic redirect URLs (GUIDs, params)
+    if (isDynamicUrl(location) && i + 1 < allRequests.length) {
       const next = allRequests[i + 1];
       const resolved = resolveUrl(entry.url, location);
       if (next.entry.url === resolved || next.entry.url === location) {

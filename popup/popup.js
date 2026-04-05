@@ -4,7 +4,7 @@
 import { generateJmx } from '../shared/jmx-generator.js';
 import { generateHar } from '../shared/har-export.js';
 import { getAuth, saveAuth, clearAuth, getOptions } from '../shared/storage.js';
-import { ASSURE_API, NHS_API } from '../shared/constants.js';
+import { STUDIO_API } from '../shared/constants.js';
 
 const $ = id => document.getElementById(id);
 
@@ -13,23 +13,24 @@ let currentAuth = null;  // { token, user, expires_at }
 
 // ── Auth ─────────────────────────────────────────────────────
 
-async function getAssureUrl() {
+async function getStudioUrl() {
   const opts = await getOptions();
-  return (opts.assureUrl || ASSURE_API.DEFAULT_URL).replace(/\/$/, '');
+  return (opts.studioUrl || STUDIO_API.DEFAULT_URL).replace(/\/$/, '');
 }
 
 async function nhsFetch(path, options = {}) {
   const opts = await getOptions();
-  const baseUrl = (opts.nhsUrl || NHS_API.DEFAULT_URL).replace(/\/$/, '');
+  const baseUrl = (opts.nhsUrl || '').replace(/\/$/, '');
+  if (!baseUrl) throw new Error('NHS Dashboard URL not configured');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
-  if (currentAuth?.token) {
-    headers['Authorization'] = `Bearer ${currentAuth.token}`;
+  if (opts.apiKey) {
+    headers['Authorization'] = `Bearer ${opts.apiKey}`;
   }
   return fetch(baseUrl + path, { ...options, headers });
 }
 
-async function assureFetch(path, options = {}) {
-  const baseUrl = await getAssureUrl();
+async function studioFetch(path, options = {}) {
+  const baseUrl = await getStudioUrl();
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (currentAuth?.token) {
     headers['Authorization'] = `Bearer ${currentAuth.token}`;
@@ -44,9 +45,16 @@ async function initAuth() {
     return;
   }
 
+  // Skip validation if no Studio URL configured
+  const opts = await getOptions();
+  if (!opts.studioUrl) {
+    renderAuthState(currentAuth.user);
+    return;
+  }
+
   // Validate token with /me
   try {
-    const resp = await assureFetch('/api/v1/auth/me');
+    const resp = await studioFetch('/api/v1/auth/me');
     if (resp.ok) {
       const data = await resp.json();
       currentAuth.user = data.user;
@@ -60,14 +68,14 @@ async function initAuth() {
       }
     }
   } catch {
-    // Offline or Assure down — use cached auth, don't log out
+    // Offline or Studio down — use cached auth, don't log out
     renderAuthState(currentAuth.user);
   }
 }
 
 async function tryRefreshToken() {
   try {
-    const resp = await assureFetch('/api/v1/auth/refresh', { method: 'POST' });
+    const resp = await studioFetch('/api/v1/auth/refresh', { method: 'POST' });
     if (resp.ok) {
       const data = await resp.json();
       currentAuth.token = data.token;
@@ -81,7 +89,7 @@ async function tryRefreshToken() {
 }
 
 async function doLogin(email, password) {
-  const resp = await assureFetch('/api/v1/auth/login', {
+  const resp = await studioFetch('/api/v1/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
@@ -94,7 +102,7 @@ async function doLogin(email, password) {
 }
 
 async function doRegister(email, password, name) {
-  const resp = await assureFetch('/api/v1/auth/register', {
+  const resp = await studioFetch('/api/v1/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password, name }),
   });
@@ -116,18 +124,19 @@ function hasFeature(feature) {
   return currentAuth?.user?.features?.includes(feature) || false;
 }
 
-function renderAuthState(user) {
+async function renderAuthState(user) {
   const headerAuth = $('cr-header-auth');
   const loginForm = $('cr-auth-login');
   const badge = $('cr-auth-badge');
   const cloudActions = $('cr-cloud-actions');
   const authPrompt = $('cr-auth-prompt');
-  const pushAssureBtn = $('cr-push-assure');
+  const pushStudioBtn = $('cr-push-studio');
   const pushNhsBtn = $('cr-push-nhs');
 
-  // Always show cloud actions — buttons prompt login if not signed in
-  cloudActions.style.display = '';
-  if (authPrompt) authPrompt.style.display = 'none';
+  // NHS button visibility — independent of Studio login, based on options config
+  const opts = await getOptions();
+  const nhsConfigured = !!(opts.nhsUrl && opts.apiKey);
+  pushNhsBtn.style.display = nhsConfigured ? '' : 'none';
 
   if (user) {
     // Logged in — show pill in header, badge below header
@@ -137,16 +146,18 @@ function renderAuthState(user) {
     $('cr-auth-name').textContent = user.name || user.email;
     $('cr-auth-org').textContent = user.org ? `${user.org.name} · ${user.org.plan}` : 'Free account';
 
-    // Feature-gate buttons
-    pushAssureBtn.style.display = hasFeature('push_to_assure') ? '' : 'none';
-    pushNhsBtn.style.display = hasFeature('push_to_assure') ? '' : 'none';
+    // Studio button — show if logged in
+    pushStudioBtn.style.display = '';
+    if (authPrompt) authPrompt.style.display = 'none';
   } else {
-    // Not logged in — show both, they'll prompt login on click
+    // Not logged in — hide Studio button, show sign-in prompt if Studio URL configured
     headerAuth.innerHTML = '<a href="#" id="cr-header-signin">Sign in</a>';
     loginForm.style.display = 'none';
     badge.style.display = 'none';
-    pushAssureBtn.style.display = '';
-    pushNhsBtn.style.display = '';
+    pushStudioBtn.style.display = 'none';
+
+    const studioConfigured = !!(opts.studioUrl);
+    if (authPrompt) authPrompt.style.display = studioConfigured ? '' : 'none';
 
     // Re-bind header sign-in link
     const signinLink = $('cr-header-signin');
@@ -157,6 +168,10 @@ function renderAuthState(user) {
       });
     }
   }
+
+  // Show cloud actions section if either button is visible
+  const anyPushVisible = pushStudioBtn.style.display !== 'none' || pushNhsBtn.style.display !== 'none';
+  cloudActions.style.display = anyPushVisible ? '' : 'none';
 }
 
 function showLoginForm() {
@@ -248,6 +263,23 @@ function showResults(session) {
   renderTransactionList(session, 'cr-res-list');
   renderAnalysisSummary(session);
   renderDataSummary(session);
+  updateStudioNudge(session, corrCount, dataReqCount);
+}
+
+function updateStudioNudge(session, corrCount, dataReqCount) {
+  const nudgeDesc = $('cr-studio-nudge-desc');
+  if (!nudgeDesc) return;
+
+  // Context-sensitive nudge based on what was recorded
+  if (corrCount > 3) {
+    nudgeDesc.textContent = corrCount + ' correlations detected. PerfOps Studio lets you inspect and fine-tune these visually.';
+  } else if (dataReqCount > 2) {
+    nudgeDesc.textContent = dataReqCount + ' data fields found. Studio auto-generates CSV templates with realistic test data types.';
+  } else if (session.transactions && session.transactions.length > 1) {
+    nudgeDesc.textContent = 'Combine this with other journeys into a load test plan with visual load shaping and live monitoring.';
+  } else {
+    nudgeDesc.textContent = 'Combine recordings into a visual test plan with live monitoring and NFR compliance.';
+  }
 }
 
 function renderAnalysisSummary(session) {
@@ -279,7 +311,7 @@ function renderAnalysisSummary(session) {
       html += `<div class="cr-analysis-item">
         <span class="cr-tag cr-tag-${d.classification}">${d.classification}</span>
         <span class="cr-analysis-name">${esc(d.fieldName)}</span>
-        <span class="cr-analysis-detail">${esc(d.suggestedCsvColumn)} → ${esc(d.assureColumnType || '')}</span>
+        <span class="cr-analysis-detail">${esc(d.suggestedCsvColumn)} → ${esc(d.columnType || '')}</span>
       </div>`;
     }
     html += '</div>';
@@ -323,7 +355,7 @@ function renderDataSummary(session) {
         ${esc(d.fieldName)}
       </td>
       <td class="cr-mono">${esc(d.suggestedCsvColumn)}</td>
-      <td>${esc(d.assureColumnType || '—')}</td>
+      <td>${esc(d.columnType || '—')}</td>
       <td class="cr-mono cr-truncate" title="${esc(d.sampleValue)}">${esc(d.sampleValue)}</td>
     </tr>`;
   }
@@ -439,7 +471,7 @@ $('cr-download-csv').addEventListener('click', async () => {
   downloadFile(csv, `${result.session.journeyCode}_test_data.csv`, 'text/csv');
 });
 
-$('cr-push-assure').addEventListener('click', async () => {
+$('cr-push-studio').addEventListener('click', async () => {
   if (!currentAuth?.token) {
     showLoginForm();
     return;
@@ -447,7 +479,7 @@ $('cr-push-assure').addEventListener('click', async () => {
   const result = await chrome.runtime.sendMessage({ type: 'get-session' });
   if (!result.session) return;
   const session = result.session;
-  const btn = $('cr-push-assure');
+  const btn = $('cr-push-studio');
   btn.textContent = 'Pushing...';
   btn.disabled = true;
   try {
@@ -457,7 +489,7 @@ $('cr-push-assure').addEventListener('click', async () => {
 
     // 1. Save full recording (session JSON, page responses, correlations, etc.)
     btn.textContent = 'Saving recording...';
-    const recResp = await assureFetch('/api/v1/recordings', {
+    const recResp = await studioFetch('/api/v1/recordings', {
       method: 'POST',
       body: JSON.stringify({ recording: session, project_id: projectId }),
     });
@@ -529,19 +561,9 @@ $('cr-push-assure').addEventListener('click', async () => {
       }],
     };
 
-    const manResp = await assureFetch('/nfr-perftest/api/v1/scripts/manifest', {
-      method: 'POST',
-      body: JSON.stringify(manifest),
-    });
-    const manCt = manResp.headers.get('content-type') || '';
-    if (manResp.ok) {
-      console.log('Manifest pushed');
-    } else if (manCt.includes('json')) {
-      const manData = await manResp.json();
-      errors.push('Manifest: ' + (manData.message || manData.error || manResp.status));
-    } else {
-      errors.push('Manifest: HTTP ' + manResp.status);
-    }
+    // Manifest push — Studio will handle this via UJ Builder
+    // For now, the recording contains all the data needed
+    console.log('Manifest data prepared (stored in recording)');
 
     // Report results
     if (errors.length === 0) {
@@ -551,7 +573,7 @@ $('cr-push-assure').addEventListener('click', async () => {
       alert('Some pushes failed:\n' + errors.join('\n'));
     }
   } catch (err) {
-    btn.textContent = 'Push to Assure';
+    btn.textContent = 'Push to Studio';
     alert('Push failed: ' + err.message);
   } finally {
     btn.disabled = false;
@@ -559,8 +581,9 @@ $('cr-push-assure').addEventListener('click', async () => {
 });
 
 $('cr-push-nhs').addEventListener('click', async () => {
-  if (!currentAuth?.token) {
-    showLoginForm();
+  const opts = await getOptions();
+  if (!opts.nhsUrl || !opts.apiKey) {
+    alert('Configure NHS Dashboard URL and API Key in extension options first.');
     return;
   }
   const result = await chrome.runtime.sendMessage({ type: 'get-session' });
@@ -650,8 +673,8 @@ $('cr-auth-register').addEventListener('click', async () => {
 async function doOAuthLogin(providerId) {
   $('cr-auth-error').style.display = 'none';
 
-  // 1. Fetch provider config from Assure
-  const resp = await assureFetch('/api/v1/auth/providers');
+  // 1. Fetch provider config from Studio
+  const resp = await studioFetch('/api/v1/auth/providers');
   if (!resp.ok) throw new Error('Could not fetch auth providers');
   const { providers } = await resp.json();
   const provider = providers.find(p => p.id === providerId);
@@ -685,8 +708,8 @@ async function doOAuthLogin(providerId) {
   if (!code) throw new Error('No authorization code returned');
   if (returnedState !== state) throw new Error('State mismatch — possible CSRF');
 
-  // 5. Exchange code for Contexta JWT via Assure backend
-  const exchangeResp = await assureFetch('/api/v1/auth/oauth', {
+  // 5. Exchange code for JWT via Studio backend
+  const exchangeResp = await studioFetch('/api/v1/auth/oauth', {
     method: 'POST',
     body: JSON.stringify({
       provider: providerId,

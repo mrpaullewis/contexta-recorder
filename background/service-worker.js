@@ -198,16 +198,18 @@ chrome.debugger.onEvent.addListener(async (source, method, params) => {
       if (body) {
         entry.response.bodySnippet = body.substring(0, MAX_BODY_SNIPPET);
 
-        // Save full page HTML for Document responses — drives correlation
-        if (entry.resourceType === 'Document') {
-          session.pageResponses.push({
-            seq: entry.seq,
-            url: entry.url,
-            path: entry.path,
-            transaction: session.currentTransaction?.name || '',
-            body,
-          });
-        }
+        // Save full response body for ALL non-static responses
+        // The builder needs complete data for correlation detection and assertions
+        session.pageResponses.push({
+          seq: entry.seq,
+          url: entry.url,
+          path: entry.path,
+          transaction: session.currentTransaction?.name || '',
+          contentType: entry.response?.contentType || '',
+          status: entry.response?.status,
+          size: body.length,
+          body,
+        });
       }
       await storage.saveSession(session);
       // Notify popup of new request

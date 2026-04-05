@@ -57,7 +57,7 @@ export async function deleteSavedSession(sessionId) {
 export async function getOptions() {
   const result = await chrome.storage.local.get(KEYS.OPTIONS);
   return result[KEYS.OPTIONS] || {
-    assureUrl: '',
+    studioUrl: '',
     apiKey: '',
     excludedDomains: [],
     recordStaticResources: false,

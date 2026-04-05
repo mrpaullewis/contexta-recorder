@@ -12,6 +12,7 @@
     "webRequest",
     "activeTab",
     "storage",
+    "unlimitedStorage",
     "tabs",
     "downloads",
     "debugger",
