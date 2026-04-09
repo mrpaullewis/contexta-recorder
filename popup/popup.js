@@ -619,6 +619,26 @@ $('cr-push-nhs').addEventListener('click', async () => {
 
 // ── Auth event listeners ─────────────────────────────────────
 
+// Google / Microsoft OAuth buttons are visible but not yet wired to a
+// working backend. Showing a friendly notice keeps the privacy policy
+// statement honest (users see the future option exists) and makes
+// re-enabling them a one-line change (remove the data-disabled attribute).
+function wireComingSoonProvider(buttonId, providerName) {
+  const btn = $(buttonId);
+  if (!btn) return;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const err = $('cr-auth-error');
+    if (err) {
+      err.textContent = `${providerName} sign-in is coming soon. Use email and password for now.`;
+      err.style.display = '';
+      setTimeout(() => { err.style.display = 'none'; }, 4000);
+    }
+  });
+}
+wireComingSoonProvider('cr-auth-google', 'Google');
+wireComingSoonProvider('cr-auth-sso', 'Microsoft');
+
 $('cr-auth-signin').addEventListener('click', async () => {
   const email = $('cr-auth-email').value.trim();
   const password = $('cr-auth-password').value;
