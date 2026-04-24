@@ -104,9 +104,6 @@ body {
 .cr-btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
 .cr-btn-primary:hover { background: #163d30; }
 
-.cr-btn-assure { background: var(--teal); color: #fff; border-color: var(--teal); }
-.cr-btn-assure:hover { background: #4a7a73; }
-
 .cr-btn-new {
   font-size: 12px;
   flex: 1;

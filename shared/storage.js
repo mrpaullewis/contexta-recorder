@@ -39,7 +39,7 @@ export async function getOptions() {
     recordStaticResources: false,
     autoTransaction: false,
     defaultJourneyCode: 'UJ01',
-    namingConvention: 'slug',  // 'slug' | 'nhs' | 'plain'
+    namingConvention: 'slug',  // 'slug' | 'plain'
     stepPadding: 2,            // 2 → S01, 3 → S001
   };
 }

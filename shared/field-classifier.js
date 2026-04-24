@@ -30,7 +30,7 @@ export function classifyFields(session) {
 
         // Only fields that need parameterisation go into dataRequirements
         if (classification === 'input' || classification === 'radio' || classification === 'select') {
-          const assureType = suggestColumnType(field);
+          const columnType = suggestColumnType(field);
           dataRequirements.push({
             fieldName: field.name,
             fieldType: field.type,
@@ -40,7 +40,7 @@ export function classifyFields(session) {
             sampleValue: field.value || '',
             label: field.label || '',
             suggestedCsvColumn: suggestCsvColumn(field),
-            columnType: assureType,
+            columnType,
             datafileSpecId: null,
             datafileColumn: null,
           });

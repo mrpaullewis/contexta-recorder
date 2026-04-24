@@ -268,7 +268,7 @@ async function importRecording(recordingId) {
 
 ### 5.3 Data the user should know lives in the extension
 
-Recordings can contain PII — passwords typed into forms, NHS numbers, session cookies, CSRF tokens, hidden form values. Your tool should:
+Recordings can contain PII — passwords typed into forms, personal identifiers, session cookies, CSRF tokens, hidden form values. Your tool should:
 
 - Display a clear notice when pulling a recording, so the user understands what's being transferred.
 - Treat pulled recordings as sensitive by default (TLS in transit, encryption at rest if stored, retention policy, deletion capability).

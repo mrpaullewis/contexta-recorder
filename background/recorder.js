@@ -83,7 +83,7 @@ export function autoTransactionName(session, url) {
   const slug = path.split('/').filter(Boolean).pop() || 'index';
 
   if (convention === 'plain') return `${code}_${step}`;
-  // Both 'slug' and 'nhs' append the slug — they differ only in user intent
+  // 'slug' appends the URL slug to the step name
   return `${code}_${step}_${slug}`;
 }
 

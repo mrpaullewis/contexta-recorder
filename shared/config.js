@@ -4,7 +4,7 @@
  * Generates fingerprints from page content (heading + sorted field names) and
  * matches them against saved configs to auto-fill known answers.
  *
- * Compatible with NHS Dashboard DefinitionJSON format.
+ * Emits a DefinitionJSON-shaped structure for downstream tooling.
  *
  * Fingerprint key format:
  *   "What is your name?|Firstname,Surname"
@@ -179,7 +179,7 @@ export function applyConfigAnswers(pageFingerprint, matchedConfig) {
 }
 
 /**
- * Convert session fingerprints to NHS Dashboard DefinitionJSON format.
+ * Convert session fingerprints to DefinitionJSON-shaped output.
  */
 export function toDefinitionJson(session, fingerprints) {
   const pages = [];

@@ -140,31 +140,31 @@
     .btn-primary:hover { background: #e0b55a; }
     .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
     .btn-secondary:hover { background: var(--bg-card); border-color: var(--teal); }
-    .btn-assure { background: var(--navy); color: #fff; }
-    .btn-assure:hover { background: #163d30; }
+    .btn-studio { background: var(--navy); color: #fff; }
+    .btn-studio:hover { background: #163d30; }
 
-    /* Assure pitch */
-    .assure-pitch {
+    /* Studio pitch */
+    .studio-pitch {
       background: linear-gradient(135deg, var(--navy), #1a3d32);
       border: 1px solid var(--teal);
       border-radius: var(--radius);
       padding: 28px;
       margin-bottom: 32px;
     }
-    .assure-pitch h2 { font-size: 1.2rem; margin-bottom: 8px; }
-    .assure-pitch p { color: rgba(255,255,255,0.8); margin-bottom: 16px; }
-    .assure-features {
+    .studio-pitch h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    .studio-pitch p { color: rgba(255,255,255,0.8); margin-bottom: 16px; }
+    .studio-features {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-bottom: 20px;
     }
-    .assure-feature {
+    .studio-feature {
       display: flex; align-items: center; gap: 8px;
       font-size: 0.85rem;
       color: rgba(255,255,255,0.9);
     }
-    .assure-check { color: var(--gold); font-weight: 700; }
+    .studio-check { color: var(--gold); font-weight: 700; }
 
     /* Help section */
     .help {
@@ -194,7 +194,7 @@
     @media (max-width: 600px) {
       .features { grid-template-columns: 1fr; }
       .detect-grid { grid-template-columns: 1fr 1fr; }
-      .assure-features { grid-template-columns: 1fr; }
+      .studio-features { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -361,18 +361,18 @@
     </div>
 
     <!-- PerfOps Studio Pitch -->
-    <div class="assure-pitch">
+    <div class="studio-pitch">
       <h2>Take it further with PerfOps Studio</h2>
       <p>The recorder gives you the script. Studio gives you the full pipeline — from journey building to distributed execution to NFR evaluation.</p>
-      <div class="assure-features">
-        <div class="assure-feature"><span class="assure-check">+</span> Save recordings to Studio</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Visual UJ Builder with live replay</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Build and parameterise test data</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Execute distributed load tests</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Auto-evaluate NFR pass/fail</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Share journey configs with your team</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Live monitoring dashboards</div>
-        <div class="assure-feature"><span class="assure-check">+</span> Results dashboards and trend analysis</div>
+      <div class="studio-features">
+        <div class="studio-feature"><span class="studio-check">+</span> Save recordings to Studio</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Visual UJ Builder with live replay</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Build and parameterise test data</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Execute distributed load tests</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Auto-evaluate NFR pass/fail</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Share journey configs with your team</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Live monitoring dashboards</div>
+        <div class="studio-feature"><span class="studio-check">+</span> Results dashboards and trend analysis</div>
       </div>
       <div class="cta-buttons">
         <a href="https://perfops.studio" target="_blank" class="btn btn-primary">Open PerfOps Studio</a>
