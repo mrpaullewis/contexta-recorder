@@ -7,7 +7,7 @@
  * - Debugger API (network capture)
  * - Storage (persisting sessions)
  */
-import { State, MAX_BODY_SNIPPET } from '../shared/constants.js';
+import { State, MAX_BODY_SNIPPET, PULL_API_VERSION, SUPPORTED_FORMATS } from '../shared/constants.js';
 import * as storage from '../shared/storage.js';
 import {
   createSession, startTransaction, endTransaction,
@@ -18,6 +18,8 @@ import { detectCorrelations } from './correlator.js';
 import { classifyFields } from '../shared/field-classifier.js';
 import { generateAssertions } from '../shared/assertion-generator.js';
 import { generateSessionFingerprints } from '../shared/config.js';
+import { generateJmx } from '../shared/jmx-generator.js';
+import { generateHar } from '../shared/har-export.js';
 
 let currentState = State.IDLE;
 let session = null;
@@ -105,9 +107,9 @@ async function stopRecording() {
     session.fingerprints = session.fingerprints || [];
   }
 
-  // Save completed session with analysis results
+  // Save completed session with analysis results.
+  // Single-recording model: starting a new recording replaces this one.
   await storage.saveSession(session);
-  await storage.addSavedSession(session);
 
   const result = { ok: true, session };
   currentState = State.IDLE;
@@ -382,3 +384,154 @@ chrome.runtime.onInstalled.addListener((details) => {
   session = await storage.getSession();
   updateBadge();
 })();
+
+// ── External pull API (v0.2.0) ───────────────────────────────
+// Responds to messages from origins whitelisted in manifest
+// `externally_connectable.matches`. Chrome enforces the origin check
+// at the IPC layer — any message reaching this handler is already
+// from an approved origin. See docs/PULL-INTEGRATION-SPEC.md.
+
+const MAX_PAYLOAD_BYTES = 60 * 1024 * 1024; // under Chrome's ~64MB IPC cap
+
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+  if (!message || typeof message.action !== 'string') {
+    sendResponse({ error: 'invalid_request', message: 'Message must have an action field.' });
+    return false;
+  }
+
+  (async () => {
+    try {
+      switch (message.action) {
+        case 'ping':
+          sendResponse({
+            installed: true,
+            version: PULL_API_VERSION,
+            supportedFormats: SUPPORTED_FORMATS,
+            supportedJmxModes: ['fragment', 'standalone'],
+          });
+          break;
+        case 'listRecordings':
+          sendResponse(await handleListRecordings());
+          break;
+        case 'getRecording':
+          sendResponse(await handleGetRecording(message));
+          break;
+        default:
+          sendResponse({ error: 'invalid_request', message: `Unknown action: ${message.action}` });
+      }
+    } catch (err) {
+      console.error('[pull-api] handler error:', err);
+      sendResponse({ error: 'generator_error', message: err.message || String(err) });
+    }
+  })();
+
+  return true; // keep channel open for async response
+});
+
+async function handleListRecordings() {
+  // Single-recording model: only the current session (if ended) is pullable.
+  const current = await storage.getSession();
+  if (!current || !current.endTime) return { recordings: [] };
+
+  return {
+    recordings: [{
+      id: current.id,
+      name: current.name || current.journeyCode || 'Untitled',
+      journeyCode: current.journeyCode,
+      createdAt: current.startTime,
+      endedAt: current.endTime,
+      transactionCount: current.transactions?.length || 0,
+      requestCount: (current.transactions || []).reduce((n, t) => n + (t.requests?.length || 0), 0),
+      correlationCount: current.correlations?.length || 0,
+      dataFieldCount: current.dataRequirements?.length || 0,
+      sizeBytes: estimateSessionSize(current),
+    }],
+  };
+}
+
+async function handleGetRecording(message) {
+  const { id, format, options = {} } = message;
+  if (!id) return { error: 'invalid_request', message: 'id is required' };
+  if (!format) return { error: 'invalid_request', message: 'format is required' };
+  if (!SUPPORTED_FORMATS.includes(format)) {
+    return { error: 'invalid_format', message: `Format must be one of: ${SUPPORTED_FORMATS.join(', ')}` };
+  }
+
+  const recording = await findSessionById(id);
+  if (!recording) return { error: 'not_found', message: `No recording with id: ${id}` };
+
+  let content, filename, contentType;
+  const code = recording.journeyCode || 'recording';
+
+  switch (format) {
+    case 'json':
+      content = JSON.stringify(recording, null, 2);
+      filename = `${code}_recording.json`;
+      contentType = 'application/json';
+      break;
+    case 'jmx': {
+      const mode = options.mode || 'fragment';
+      if (!['fragment', 'standalone'].includes(mode)) {
+        return { error: 'invalid_options', message: `Invalid JMX mode: ${mode}` };
+      }
+      content = generateJmx(recording, { mode });
+      filename = `${code}${mode === 'fragment' ? '' : '_standalone'}.jmx`;
+      contentType = 'application/octet-stream';
+      break;
+    }
+    case 'har':
+      content = JSON.stringify(generateHar(recording), null, 2);
+      filename = `${code}_recording.har`;
+      contentType = 'application/json';
+      break;
+    case 'csv': {
+      const dataReqs = recording.dataRequirements || [];
+      if (dataReqs.length === 0) {
+        return { error: 'no_data_fields', message: 'No form fields detected; CSV unavailable.' };
+      }
+      const headers = dataReqs.map(d => d.suggestedCsvColumn);
+      const values = dataReqs.map(d => csvEscapeValue(d.sampleValue || ''));
+      content = headers.join(',') + '\n' + values.join(',') + '\n';
+      filename = `${code}_test_data.csv`;
+      contentType = 'text/csv';
+      break;
+    }
+  }
+
+  const payloadBytes = new Blob([content]).size;
+  if (payloadBytes > MAX_PAYLOAD_BYTES) {
+    return {
+      error: 'too_large',
+      message: `Recording is ${Math.round(payloadBytes / 1024 / 1024)}MB, exceeds ${MAX_PAYLOAD_BYTES / 1024 / 1024}MB IPC limit.`,
+    };
+  }
+
+  return { format, filename, contentType, content };
+}
+
+async function findSessionById(id) {
+  const current = await storage.getSession();
+  if (current && current.id === id) return current;
+  return null;
+}
+
+function estimateSessionSize(recording) {
+  let size = 0;
+  for (const pr of recording.pageResponses || []) {
+    size += (pr.body?.length || 0);
+  }
+  for (const tx of recording.transactions || []) {
+    for (const r of tx.requests || []) {
+      size += (r.requestBody?.length || 0) + (r.responseBody?.length || 0);
+    }
+  }
+  return size;
+}
+
+function csvEscapeValue(val) {
+  const s = String(val);
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}

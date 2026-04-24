@@ -6,7 +6,6 @@ const $ = id => document.getElementById(id);
 async function load() {
   const opts = await getOptions();
   $('opt-studio-url').value = opts.studioUrl || '';
-  $('opt-nhs-url').value = opts.nhsUrl || '';
   $('opt-api-key').value = opts.apiKey || '';
   $('opt-journey-code').value = opts.defaultJourneyCode || 'UJ01';
   $('opt-naming').value = opts.namingConvention || 'slug';
@@ -36,7 +35,6 @@ $('opt-journey-code').addEventListener('input', updateNamingPreview);
 $('opt-save').addEventListener('click', async () => {
   await saveOptions({
     studioUrl: $('opt-studio-url').value.trim().replace(/\/$/, ''),
-    nhsUrl: $('opt-nhs-url').value.trim().replace(/\/$/, ''),
     apiKey: $('opt-api-key').value.trim(),
     defaultJourneyCode: $('opt-journey-code').value.trim() || 'UJ01',
     namingConvention: $('opt-naming').value,

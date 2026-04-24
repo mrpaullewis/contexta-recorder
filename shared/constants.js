@@ -102,3 +102,7 @@ export const STUDIO_API = {
   MANIFESTS_ENDPOINT: '/builder/manifests',
   CONFIGS_ENDPOINT: '/builder/configs',
 };
+
+// Pull API (v0.2.0) — see docs/PULL-INTEGRATION-SPEC.md
+export const PULL_API_VERSION = '0.2.0';
+export const SUPPORTED_FORMATS = ['jmx', 'har', 'json', 'csv'];

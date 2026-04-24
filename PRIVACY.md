@@ -1,6 +1,6 @@
 # Privacy Policy — Contexta Performance Recorder
 
-**Last updated:** 31 March 2026
+**Last updated:** 24 April 2026
 
 ## What the extension does
 
@@ -10,47 +10,35 @@ Contexta Performance Recorder is a Chrome extension that records browser session
 
 ### During recording (local only)
 - HTTP request URLs, headers, and bodies
-- HTTP response status codes, headers, and body snippets
+- HTTP response status codes, headers, and body content
 - Form field names, types, values, and labels
-- Page titles, headings, and structure
+- Page titles, headings, and HTML structure
 - Request timing data
 
-This data is stored locally in your browser using Chrome's storage API. It is **never transmitted** unless you explicitly choose to push it to a server (see below).
-
-### When you sign in (optional)
-If you choose to sign in with Google or Microsoft:
-- Your email address and display name are stored locally to maintain your session
-- A JWT authentication token is stored locally
-
-### When you push to Contexta Assure or NHS Dashboard (optional)
-If you explicitly click "Push to Assure" or "Push to NHS Dashboard":
-- Your recording data is sent to the server you are connected to
-- This includes request/response data, correlations, and form field classifications
-- Data is transmitted over HTTPS
+This data is stored locally in your browser using Chrome's storage API. It is **never transmitted** to any server by the extension.
 
 ## What data is NOT collected
 - No data is collected when the extension is idle (not recording)
 - No browsing history is tracked
 - No analytics or telemetry is sent
+- No account or login is required
+- No data is sent to any server by the extension
 - No data is sold to third parties
 - No data is shared with advertisers
 - No data is used for purposes unrelated to performance test script generation
 
 ## Data storage
-- All recording data is stored locally in Chrome's extension storage
+- All recording data is stored locally in Chrome's extension storage on your device
 - Local data persists until you clear it or uninstall the extension
-- Authentication tokens are stored locally and can be cleared by signing out
+- You can export recordings as downloadable files (JMX, HAR) on your own machine
 
 ## Third-party services
-The extension connects to external services only when you explicitly initiate it:
-- **Google OAuth** — when you click "Sign in with Google"
-- **Microsoft Entra** — when you click "Sign in with Microsoft"
-- **Contexta Assure** (dev.contexta.uk) — when you click "Push to Assure"
+The extension does not connect to any external services. All processing (correlation detection, assertion generation, JMX script generation) happens locally in your browser.
 
 ## Your rights
 - You can view all stored data via Chrome's developer tools
-- You can clear all data by clicking "Clear" in the extension popup
-- You can sign out at any time to remove authentication data
+- You can clear the current session by clicking "Clear" in the extension popup
+- You can delete specific saved recordings via the extension's saved-sessions list
 - You can uninstall the extension to remove all local data
 
 ## Contact

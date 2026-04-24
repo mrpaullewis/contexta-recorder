@@ -3,3 +3,7 @@ node_modules/
 test-results/
 package-lock.json
 contexta-recorder.zip
+
+# Extension signing private key — must not be committed
+.extension-signing-key.pem
+contexta-recorder-v0.2.0.zip
