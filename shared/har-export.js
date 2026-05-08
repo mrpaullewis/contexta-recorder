@@ -20,7 +20,7 @@ export function generateHar(session) {
       version: '1.2',
       creator: {
         name: 'Contexta Performance Recorder',
-        version: '0.1.0',
+        version: chrome.runtime.getManifest().version,
       },
       pages: session.transactions.map((tx, i) => ({
         startedDateTime: tx.startTime,

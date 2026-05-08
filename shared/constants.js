@@ -93,7 +93,7 @@ export const THINK_TIME = {
 // with hidden fields and CSRF tokens typically starts after 4-6KB.
 export const MAX_BODY_SNIPPET = 65536;
 
-// PerfOps Studio API defaults
+// Contexta Performance Studio API defaults
 export const STUDIO_API = {
   DEFAULT_URL: 'http://localhost:5000',
   HEALTH_ENDPOINT: '/health',

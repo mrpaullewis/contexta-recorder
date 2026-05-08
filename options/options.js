@@ -48,7 +48,7 @@ $('opt-save').addEventListener('click', async () => {
 $('opt-test-studio').addEventListener('click', async () => {
   const url = $('opt-studio-url').value.trim();
   const key = $('opt-api-key').value.trim();
-  if (!url) { $('opt-status').textContent = 'Enter PerfOps Studio URL first'; return; }
+  if (!url) { $('opt-status').textContent = 'Enter Contexta Performance Studio URL first'; return; }
   $('opt-status').textContent = 'Testing Studio...';
   try {
     const resp = await fetch(url + '/health', {

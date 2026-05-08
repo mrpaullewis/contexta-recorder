@@ -1,6 +1,6 @@
 {
   "name": "contexta-recorder",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Contexta Performance Recorder — Chrome extension for JMeter test script generation",
   "private": true,
   "type": "module",

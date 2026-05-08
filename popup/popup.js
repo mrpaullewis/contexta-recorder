@@ -94,7 +94,7 @@ function updateStudioNudge(session, corrCount, dataReqCount) {
 
   // Context-sensitive nudge based on what was recorded
   if (corrCount > 3) {
-    nudgeDesc.textContent = corrCount + ' correlations detected. PerfOps Studio lets you inspect and fine-tune these visually.';
+    nudgeDesc.textContent = corrCount + ' correlations detected. Contexta Performance Studio lets you inspect and fine-tune these visually.';
   } else if (dataReqCount > 2) {
     nudgeDesc.textContent = dataReqCount + ' data fields found. Studio auto-generates CSV templates with realistic test data types.';
   } else if (session.transactions && session.transactions.length > 1) {

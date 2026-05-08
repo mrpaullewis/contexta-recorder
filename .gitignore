@@ -6,7 +6,7 @@ contexta-recorder.zip
 
 # Extension signing private key — must not be committed
 .extension-signing-key.pem
-contexta-recorder-v0.2.0.zip
+contexta-recorder-v*.zip
 
 # Internal docs — kept locally for reference but not published
 docs/

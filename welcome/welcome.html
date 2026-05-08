@@ -356,13 +356,13 @@
       </details>
       <details class="help-item">
         <summary>Do I need a Contexta account?</summary>
-        <p>No. The recorder works completely standalone — record, analyse, and download scripts with no account needed. PerfOps Studio is a separate product you can sign into directly at perfops.studio to build test plans visually and execute distributed load tests.</p>
+        <p>No. The recorder works completely standalone — record, analyse, and download scripts with no account needed. Contexta Performance Studio is a separate companion product, also operated by Contexta, that you can sign into directly at studio.contexta.uk to build test plans visually and execute distributed load tests.</p>
       </details>
     </div>
 
-    <!-- PerfOps Studio Pitch -->
+    <!-- Contexta Performance Studio Pitch -->
     <div class="studio-pitch">
-      <h2>Take it further with PerfOps Studio</h2>
+      <h2>Take it further with Contexta Performance Studio</h2>
       <p>The recorder gives you the script. Studio gives you the full pipeline — from journey building to distributed execution to NFR evaluation.</p>
       <div class="studio-features">
         <div class="studio-feature"><span class="studio-check">+</span> Save recordings to Studio</div>
@@ -375,7 +375,7 @@
         <div class="studio-feature"><span class="studio-check">+</span> Results dashboards and trend analysis</div>
       </div>
       <div class="cta-buttons">
-        <a href="https://perfops.studio" target="_blank" class="btn btn-primary">Open PerfOps Studio</a>
+        <a href="https://studio.contexta.uk" target="_blank" class="btn btn-primary">Open Studio</a>
       </div>
     </div>
 
@@ -391,7 +391,14 @@
   </div>
 
   <div class="footer">
-    <p>Contexta Performance Recorder v0.1.0 &middot; <a href="https://dev.contexta.uk">dev.contexta.uk</a> &middot; <a href="https://dev.contexta.uk/help/">Help</a></p>
+    <p>Contexta Performance Recorder v<span id="cr-version">0.3.0</span> &middot; <a href="https://contexta.uk">contexta.uk</a> &middot; <a href="https://contexta.uk/help/">Help</a></p>
+  </div>
+
+  <script>
+    // Read live extension version so this footer doesn't go stale on each release.
+    if (window.chrome && chrome.runtime && chrome.runtime.getManifest) {
+      document.getElementById('cr-version').textContent = chrome.runtime.getManifest().version;
+    }
   </div>
 
 </body>
